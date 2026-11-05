@@ -221,11 +221,11 @@ const MONDAY_ITEMS = [
     kind:"pair", n:1, start:560, end:660, 
     halves:[
       { label:"1-й урок", start:560, end:605 },
-      { label:"Перемена", start:605, end:615 }, // Внутри пары просто перемена
+      { label:"Перемена", start:605, end:615 }, 
       { label:"2-й урок", start:615, end:660 }
     ]
   },
-  { kind:"break", title:"Завтрак", start:660, end:665 }, // Завтрак ПОСЛЕ 1-й пары (11:00 - 11:05)
+  { kind:"break", title:"Завтрак", start:660, end:665 }, // Завтрак ПОСЛЕ 1-й пары
   
   { 
     kind:"pair", n:2, start:665, end:760, 
@@ -235,7 +235,7 @@ const MONDAY_ITEMS = [
       { label:"2-й урок", start:715, end:760 }
     ]
   },
-  { kind:"break", title:"Обед", start:760, end:790 }, // Обед после 2-й пары
+  { kind:"break", title:"Обед", start:760, end:790 },
   
   { 
     kind:"pair", n:3, start:790, end:885, 
@@ -454,42 +454,44 @@ function tick(){
 
   if (ci >= 0){
     const it = items[ci];
+    let titleText = "";
+    let currentEnd = it.end;
+
     if (it.kind === "pair"){
       const h = it.halves[chi];
-      const isLast = chi === it.halves.length - 1;
-      const nextLabel = isLast ? "конца" : it.halves[chi+1].label.toLowerCase();
-      
+      currentEnd = h.end;
       if (it.n === 0) {
-        statusEl.innerHTML =
-          `Сейчас: <b>Разговоры о важном</b><br>`+
-          `До конца — <b>${fmtRemain((h.end - nowMin)*60)}</b>`;
+        titleText = "Разговоры о важном";
       } else {
         const isLesson = h.label.includes("урок");
-        const titleText = isLesson ? `${h.label} ${it.n}-й пары` : h.label;
-        
-        statusEl.innerHTML =
-          `Сейчас: <b>${titleText}</b><br>`+
-          `До ${isLesson ? nextLabel : 'конца'} — <b>${fmtRemain((h.end - nowMin)*60)}</b>`;
+        titleText = isLesson ? `${h.label} ${it.n}-й пары` : h.label;
       }
     } else {
-      const next = items.find(x => x.start > nowMin);
-      const nextLabel = next
-        ? (next.kind === "pair" ? `начала ${next.n}-й пары` : `конца перемены`)
-        : "конца";
-      statusEl.innerHTML =
-        `Сейчас: <b>${it.title}</b><br>`+
-        `До ${nextLabel} — <b>${fmtRemain((it.end - nowMin)*60)}</b>`;
+      titleText = it.title;
     }
+
+    // Везде, где мы находимся внутри процесса, пишем "До конца"
+    statusEl.innerHTML =
+      `Сейчас: <b>${titleText}</b><br>`+
+      `До конца — <b>${fmtRemain((currentEnd - nowMin)*60)}</b>`;
+      
   } else {
     const next = items.find(x => x.start > nowMin);
+    
     if (next){
-      let label = "";
-      if (next.kind === "pair") {
-        label = next.n === 0 ? "Разговоров о важном" : `начала ${next.n}-й пары`;
+      // Проверяем, является ли это событие самым первым в списке (утро)
+      if (items[0] === next) {
+        let label = "";
+        if (next.kind === "pair") {
+          label = next.n === 0 ? "Разговоров о важном" : `начала ${next.n}-й пары`;
+        } else {
+          label = `начала ${next.title.toLowerCase()}`;
+        }
+        statusEl.innerHTML = `До ${label} — <b>${fmtRemain((next.start - nowMin)*60)}</b>`;
       } else {
-        label = next.title;
+        // Запасной вариант, если вдруг попали в "дырку" между парами, которой нет в расписании
+        statusEl.innerHTML = `До следующего события — <b>${fmtRemain((next.start - nowMin)*60)}</b>`;
       }
-      statusEl.innerHTML = `До ${label} — <b>${fmtRemain((next.start - nowMin)*60)}</b>`;
     } else {
       statusEl.innerHTML = "На сегодня всё 🎉";
     }
