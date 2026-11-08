@@ -5,113 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Расписание</title>
 <style>
-  /* Темная тема (по умолчанию) */
   :root[data-theme="dark"] {
-    --bg: #0e1014; 
-    --card: #171a21; 
-    --card-active: #1c2431;
-    --text: #e8edf5; 
-    --muted: #7f8899; 
-    --accent: #58a6ff;
-    --accent-soft: rgba(88,166,255,.12); 
-    --line: #232833;
-    --break: #2a3542; 
-    --break-current: #33465a;
+    --bg: #0e1014; --card: #171a21; --card-active: #1c2431;
+    --text: #e8edf5; --muted: #7f8899; --accent: #58a6ff;
+    --accent-soft: rgba(88,166,255,.12); --line: #232833;
+    --break: #2a3542; --break-current: #33465a;
     --half-bg: rgba(255,255,255,.02);
     --shadow-card: none;
     --shadow-current: 0 8px 24px rgba(88,166,255,.12);
   }
-
-  /* Светлая тема */
   :root[data-theme="light"] {
-    --bg: #f4f7f9; 
-    --card: #ffffff; 
-    --card-active: #f0f7ff;
-    --text: #1e293b; 
-    --muted: #64748b; 
-    --accent: #2563eb;
-    --accent-soft: rgba(37,99,235,.08); 
-    --line: #e2e8f0;
-    --break: #f8fafc; 
-    --break-current: #f0f7ff;
+    --bg: #f4f7f9; --card: #ffffff; --card-active: #f0f7ff;
+    --text: #1e293b; --muted: #64748b; --accent: #2563eb;
+    --accent-soft: rgba(37,99,235,.08); --line: #e2e8f0;
+    --break: #f8fafc; --break-current: #f0f7ff;
     --half-bg: rgba(0,0,0,.03);
     --shadow-card: 0 1px 3px rgba(0,0,0,.04);
     --shadow-current: 0 8px 24px rgba(37,99,235,.1);
   }
-
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
-  
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     background:var(--bg);color:var(--text);
     padding:16px 14px 40px;min-height:100vh;-webkit-font-smoothing:antialiased;
     transition: background-color .3s, color .3s;
   }
-  
-  /* Шапка */
   .header{
-    position:sticky; top:0; background:var(--bg); 
+    position:sticky; top:0; background:var(--bg);
     padding:8px 0 12px; z-index:10;
     transition: background-color .3s;
   }
   .clock{font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1.5px;line-height:1}
-  
-  /* Дата и управление */
   .top-row{
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 8px; margin-bottom: 14px; gap: 10px;
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:8px; margin-bottom:14px; gap:10px; flex-wrap:wrap;
   }
-  .date{color:var(--muted);font-size:14px; flex: 1;}
-  
-  .controls {
-    display: flex; gap: 8px; align-items: center;
-  }
+  .date{color:var(--muted);font-size:14px; flex:1; min-width:140px}
+  .controls{display:flex; gap:8px; align-items:center}
 
-  /* Стилизация выпадающего списка */
-  .mode-select {
-    background: var(--card); color: var(--text);
-    border: 1px solid var(--line); border-radius: 8px;
-    padding: 8px 32px 8px 12px; font-size: 13px; font-family: inherit;
-    font-weight: 600; outline: none; cursor: pointer;
-    appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 14px;
-    transition: background-color .3s, border-color .2s, color .3s;
-    box-shadow: var(--shadow-card);
+  /* Чипы режимов */
+  .chips{
+    display:flex; gap:2px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:3px;
+    box-shadow:var(--shadow-card);
   }
-  .mode-select:focus { border-color: var(--accent); }
+  .chip{
+    background:transparent; color:var(--muted); border:0;
+    padding:6px 10px; font-size:12px; font-weight:600;
+    font-family:inherit; cursor:pointer; border-radius:7px;
+    transition: background-color .15s, color .15s;
+    white-space:nowrap;
+  }
+  .chip.active{ background:var(--accent); color:var(--bg); }
 
-  /* Кнопка темы */
-  .theme-btn {
-    background: var(--card); color: var(--text);
-    border: 1px solid var(--line); border-radius: 8px;
-    padding: 7px 10px; font-size: 16px; cursor: pointer;
+  .theme-btn{
+    background:var(--card); color:var(--text);
+    border:1px solid var(--line); border-radius:8px;
+    padding:7px 10px; font-size:16px; cursor:pointer;
     transition: background-color .3s, border-color .2s, transform .1s;
-    box-shadow: var(--shadow-card);
-    line-height: 1;
+    box-shadow:var(--shadow-card); line-height:1;
   }
-  .theme-btn:active { transform: scale(.92); }
+  .theme-btn:active{ transform:scale(.92); }
 
   .status{
     padding:14px 16px;border-radius:14px;
     background:var(--card);border:1px solid var(--accent);
-    box-shadow: var(--shadow-current);
+    box-shadow:var(--shadow-current);
     font-size:15px;line-height:1.4; color:var(--text);
     transition: background-color .3s, border-color .3s;
   }
   .status b{color:var(--accent);font-variant-numeric:tabular-nums}
 
-  /* Список карточек */
   .list{display:flex;flex-direction:column;gap:10px;margin-top:18px}
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:14px;transition:background-color .3s,border-color .25s,opacity .25s,box-shadow .3s;
-    box-shadow: var(--shadow-card);
+    box-shadow:var(--shadow-card);
   }
-  .card.past{opacity:.45; box-shadow: none;}
+  .card.past{opacity:.45; box-shadow:none;}
   .card.current{
     border-color:var(--accent);background:var(--card-active);
     box-shadow:0 0 0 1px var(--accent), var(--shadow-current);
@@ -150,28 +123,26 @@
 <body>
 <div class="header">
   <div class="clock" id="clock">--:--:--</div>
-  
   <div class="top-row">
     <div class="date" id="date">—</div>
     <div class="controls">
+      <div class="chips" id="modeChips" role="tablist">
+        <button class="chip" data-mode="auto" role="tab">Авто</button>
+        <button class="chip" data-mode="monday" role="tab">Пн</button>
+        <button class="chip" data-mode="weekday" role="tab">Вт-Пт</button>
+        <button class="chip" data-mode="saturday" role="tab">Сб</button>
+      </div>
       <button class="theme-btn" id="themeBtn" title="Сменить тему">☀️</button>
-      <select class="mode-select" id="modeSelect">
-        <option value="auto">Авто (по дню)</option>
-        <option value="monday">Понедельник</option>
-        <option value="weekday">Вт - Пт</option>
-      </select>
     </div>
   </div>
-
   <div class="status" id="status">Загрузка…</div>
 </div>
 <div class="list" id="list"></div>
 
 <script>
-/* ================= УПРАВЛЕНИЕ ТЕМОЙ ================= */
+/* ================= ТЕМА ================= */
 const themeBtn = document.getElementById('themeBtn');
 const root = document.documentElement;
-
 let currentTheme = localStorage.getItem('appTheme') || 'dark';
 root.setAttribute('data-theme', currentTheme);
 themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
@@ -183,16 +154,24 @@ themeBtn.addEventListener('click', () => {
   themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
 });
 
-
-/* ================= НАСТРОЙКИ РАСПИСАНИЯ ================= */
-
+/* ================= РАСПИСАНИЕ ================= */
 const BELLS = [
-  { n:1, start:"08:30", end:"10:05" }, 
-  { n:2, start:"10:15", end:"11:50" }, 
-  { n:3, start:"12:20", end:"13:55" }, 
-  { n:4, start:"14:05", end:"15:40" }, 
+  { n:1, start:"08:30", end:"10:05" },
+  { n:2, start:"10:15", end:"11:50" },
+  { n:3, start:"12:20", end:"13:55" },
+  { n:4, start:"14:05", end:"15:40" },
   { n:5, start:"15:50", end:"17:25" },
   { n:6, start:"17:35", end:"19:10" },
+];
+
+/* Суббота: 6 пар по 2 урока по 45 мин, перемена внутри пары 5 мин */
+const SATURDAY_BELLS = [
+  { n:1, start:"08:30", end:"10:05" },
+  { n:2, start:"10:15", end:"11:50" },
+  { n:3, start:"12:20", end:"13:55" },
+  { n:4, start:"14:00", end:"15:35" },
+  { n:5, start:"15:40", end:"17:15" },
+  { n:6, start:"17:20", end:"18:55" },
 ];
 
 const INTRA_BREAK_MIN = 5;
@@ -205,30 +184,34 @@ const BREAKS = {
   "5-6": "Перемена после 5-й пары",
 };
 
+const SATURDAY_BREAKS = {
+  "1-2": "Перемена",
+  "2-3": "Обед",
+  "3-4": "Перемена",
+  "4-5": "Перемена",
+  "5-6": "Перемена",
+};
+
 const DAY_PAIRS = { 1:6, 2:6, 3:6, 4:6, 5:6, 6:6, 0:6 };
 
-// ==========================================
-// ОСОБОЕ РАСПИСАНИЕ ДЛЯ ПОНЕДЕЛЬНИКА
-// ==========================================
+/* Особое расписание понедельника */
 const MONDAY_ITEMS = [
-  { 
-    kind:"pair", n:0, title:"Разговоры о важном", start:510, end:555, 
+  {
+    kind:"pair", n:0, title:"Разговоры о важном", start:510, end:555,
     halves:[ { label:"Разговоры о важном", start:510, end:555 } ]
   },
   { kind:"break", title:"Перемена", start:555, end:560 },
-  
-  { 
-    kind:"pair", n:1, start:560, end:660, 
+  {
+    kind:"pair", n:1, start:560, end:660,
     halves:[
       { label:"1-й урок", start:560, end:605 },
-      { label:"Перемена", start:605, end:615 }, 
+      { label:"Перемена", start:605, end:615 },
       { label:"2-й урок", start:615, end:660 }
     ]
   },
-  { kind:"break", title:"Завтрак", start:660, end:665 }, // Завтрак ПОСЛЕ 1-й пары
-  
-  { 
-    kind:"pair", n:2, start:665, end:760, 
+  { kind:"break", title:"Завтрак", start:660, end:665 },
+  {
+    kind:"pair", n:2, start:665, end:760,
     halves:[
       { label:"1-й урок", start:665, end:710 },
       { label:"Перемена", start:710, end:715 },
@@ -236,9 +219,8 @@ const MONDAY_ITEMS = [
     ]
   },
   { kind:"break", title:"Обед", start:760, end:790 },
-  
-  { 
-    kind:"pair", n:3, start:790, end:885, 
+  {
+    kind:"pair", n:3, start:790, end:885,
     halves:[
       { label:"1-й урок", start:790, end:835 },
       { label:"Перемена", start:835, end:840 },
@@ -246,9 +228,8 @@ const MONDAY_ITEMS = [
     ]
   },
   { kind:"break", title:"Перемена", start:885, end:895 },
-  
-  { 
-    kind:"pair", n:4, start:895, end:990, 
+  {
+    kind:"pair", n:4, start:895, end:990,
     halves:[
       { label:"1-й урок", start:895, end:940 },
       { label:"Перемена", start:940, end:945 },
@@ -256,9 +237,8 @@ const MONDAY_ITEMS = [
     ]
   },
   { kind:"break", title:"Перемена", start:990, end:1000 },
-  
-  { 
-    kind:"pair", n:5, start:1000, end:1095, 
+  {
+    kind:"pair", n:5, start:1000, end:1095,
     halves:[
       { label:"1-й урок", start:1000, end:1045 },
       { label:"Перемена", start:1045, end:1050 },
@@ -266,9 +246,8 @@ const MONDAY_ITEMS = [
     ]
   },
   { kind:"break", title:"Перемена", start:1095, end:1105 },
-
-  { 
-    kind:"pair", n:6, start:1105, end:1200, 
+  {
+    kind:"pair", n:6, start:1105, end:1200,
     halves:[
       { label:"1-й урок", start:1105, end:1150 },
       { label:"Перемена", start:1150, end:1155 },
@@ -277,13 +256,17 @@ const MONDAY_ITEMS = [
   }
 ];
 
-/* ================= ЛОГИКА РАСПИСАНИЯ ================= */
-
+/* ================= ЛОГИКА ================= */
 const DAY_NAMES = ["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"];
 const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
-const toMin = hm => { const [h,m]=hm.split(":").map(Number); return h*60+m; };
-const fmtTime = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(Math.round(m)%60).padStart(2,"0");
+const toMin = hm => { const [h,m] = hm.split(":").map(Number); return h*60+m; };
+
+/* Исправлено: округляем и часы, и минуты */
+const fmtTime = m => {
+  const t = Math.round(m);
+  return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+};
 
 function fmtRemain(sec){
   sec = Math.max(0, Math.floor(sec));
@@ -292,8 +275,7 @@ function fmtRemain(sec){
   return `${m} мин ${String(s).padStart(2,"0")} с`;
 }
 
-function buildItems(day, bells, dayPairs){
-  const count = dayPairs[day] || 0;
+function buildItems(bells, count, breaks){
   const items = [];
   for (let i = 0; i < count; i++){
     const bell = bells[i];
@@ -301,7 +283,6 @@ function buildItems(day, bells, dayPairs){
     const s = toMin(bell.start), e = toMin(bell.end);
     const mid = s + (e - s) / 2;
     const brk = INTRA_BREAK_MIN;
-
     const halves = [];
     if (brk > 0){
       halves.push({ label:"1-й урок", start:s, end:mid-brk/2 });
@@ -319,7 +300,7 @@ function buildItems(day, bells, dayPairs){
       if (be > bs){
         items.push({
           kind:"break", n:bell.n, start:bs, end:be,
-          title: BREAKS[`${bell.n}-${next.n}`] || `Перемена после ${bell.n}-й пары`
+          title: breaks[`${bell.n}-${next.n}`] || `Перемена после ${bell.n}-й пары`
         });
       }
     }
@@ -327,31 +308,40 @@ function buildItems(day, bells, dayPairs){
   return items;
 }
 
-function getScheduleItems(effectiveDay, mode) {
-  if (mode === "monday" || (mode === "auto" && effectiveDay === 1)) {
+function getScheduleItems(effectiveDay, mode){
+  if (mode === "monday" || (mode === "auto" && effectiveDay === 1)){
     return MONDAY_ITEMS;
   }
-  return buildItems(effectiveDay, BELLS, DAY_PAIRS);
+  if (mode === "saturday" || (mode === "auto" && effectiveDay === 6)){
+    return buildItems(SATURDAY_BELLS, 6, SATURDAY_BREAKS);
+  }
+  const day = mode === "weekday" ? 2 : effectiveDay;
+  return buildItems(BELLS, DAY_PAIRS[day] || 0, BREAKS);
 }
 
 const listEl = document.getElementById("list");
 const clockEl = document.getElementById("clock");
 const dateEl = document.getElementById("date");
 const statusEl = document.getElementById("status");
-const modeSelect = document.getElementById("modeSelect");
+const modeChips = document.getElementById("modeChips");
+const chipEls = modeChips.querySelectorAll(".chip");
 
 let items = [], cardEls = [], lastKey = null, didScroll = false;
 let mode = localStorage.getItem("scheduleMode") || "auto";
+if (!["auto","monday","weekday","saturday"].includes(mode)) mode = "auto";
 
-if (!["auto", "monday", "weekday"].includes(mode)) {
-  mode = "auto";
+function setModeActive(){
+  chipEls.forEach(el => el.classList.toggle("active", el.dataset.mode === mode));
 }
-modeSelect.value = mode;
+setModeActive();
 
-modeSelect.addEventListener("change", (e) => {
-  mode = e.target.value;
+modeChips.addEventListener("click", (e) => {
+  const btn = e.target.closest(".chip");
+  if (!btn) return;
+  mode = btn.dataset.mode;
   localStorage.setItem("scheduleMode", mode);
   lastKey = null;
+  setModeActive();
 });
 
 function render(){
@@ -371,12 +361,11 @@ function render(){
            <span class="half-time">${fmtTime(h.start)}–${fmtTime(h.end)}</span>
          </div>`
       ).join("");
-      
       const pairTitle = it.title || `Пара ${it.n}`;
-      
+      const numHtml = it.n === 0 ? '' : `<span class="pair-num">${it.n}</span>`;
       el.innerHTML = `
         <div class="pair-head">
-          <span class="pair-num">${it.n}</span>
+          ${numHtml}
           <span class="pair-title">${pairTitle}</span>
           <span class="pair-time">${fmtTime(it.start)}–${fmtTime(it.end)}</span>
         </div>
@@ -409,9 +398,9 @@ function tick(){
   let effectiveDay = realDay;
   if (mode === "monday") effectiveDay = 1;
   if (mode === "weekday") effectiveDay = 2;
+  if (mode === "saturday") effectiveDay = 6;
 
   const key = mode + ":" + effectiveDay;
-  
   if (key !== lastKey){
     lastKey = key;
     items = getScheduleItems(effectiveDay, mode);
@@ -460,7 +449,7 @@ function tick(){
     if (it.kind === "pair"){
       const h = it.halves[chi];
       currentEnd = h.end;
-      if (it.n === 0) {
+      if (it.n === 0){
         titleText = "Разговоры о важном";
       } else {
         const isLesson = h.label.includes("урок");
@@ -470,26 +459,22 @@ function tick(){
       titleText = it.title;
     }
 
-    // Везде, где мы находимся внутри процесса, пишем "До конца"
+    const tail = it.kind === "pair" ? "пары" : "перемены";
     statusEl.innerHTML =
       `Сейчас: <b>${titleText}</b><br>`+
-      `До конца — <b>${fmtRemain((currentEnd - nowMin)*60)}</b>`;
-      
+      `До конца ${tail} — <b>${fmtRemain((currentEnd - nowMin)*60)}</b>`;
   } else {
     const next = items.find(x => x.start > nowMin);
-    
     if (next){
-      // Проверяем, является ли это событие самым первым в списке (утро)
-      if (items[0] === next) {
+      if (items[0] === next){
         let label = "";
-        if (next.kind === "pair") {
+        if (next.kind === "pair"){
           label = next.n === 0 ? "Разговоров о важном" : `начала ${next.n}-й пары`;
         } else {
           label = `начала ${next.title.toLowerCase()}`;
         }
         statusEl.innerHTML = `До ${label} — <b>${fmtRemain((next.start - nowMin)*60)}</b>`;
       } else {
-        // Запасной вариант, если вдруг попали в "дырку" между парами, которой нет в расписании
         statusEl.innerHTML = `До следующего события — <b>${fmtRemain((next.start - nowMin)*60)}</b>`;
       }
     } else {
